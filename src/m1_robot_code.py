@@ -48,9 +48,12 @@ class MyRobotDelegate(object):
         position = (self.robot.drive_system.left_motor.get_position()+self.robot.drive_system.right_motor.get_position())/2
 
         while abs(position) < dist_deg: #insert condition
-            self.robot.drive_system.left_motor = left
-            self.robot.drive_system.right_motor = right
+            self.robot.drive_system.left_motor.turn_on(left)
+            self.robot.drive_system.right_motor.turn_on(right)
             position = (self.robot.drive_system.left_motor.get_position()+self.robot.drive_system.right_motor.get_position())/2
+
+        self.robot.drive_system.left_motor.turn_off()
+        self.robot.drive_system.right_motor.turn_off()
 
         print('Movement has concluded')
 
@@ -58,8 +61,8 @@ class MyRobotDelegate(object):
 
         final_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance()
 
-        if abs(final_pos-init_pos) < (dist - (dist/5)) | abs(final_pos-init_pos) > (dist + (dist/5)):
-            print('Unfortunately it was wildly off. Perhaps the code is wrong or a sensor is malfunctioning')
+        if abs(final_pos-init_pos) < (dist - (dist/5)) or abs(final_pos-init_pos) > (dist + (dist/5)):
+            print('Unfortunately it was wildly off. Perhaps the code is wrong or a sensor is malfunctioning. Or maybe it is just on the wooden board or something stupid like that.')
         else:
             print('It arrived within 20% of its target distance. Nice work!')
 
@@ -78,13 +81,15 @@ class MyRobotDelegate(object):
         deg_ratio = degrees / dist_per_spin
         dist_deg = deg_ratio * dist
 
-        position = (
-                               self.robot.drive_system.left_motor.get_position() + self.robot.drive_system.right_motor.get_position()) / 2
+        position = (self.robot.drive_system.left_motor.get_position() + self.robot.drive_system.right_motor.get_position()) / 2
 
         while abs(position) < dist_deg:  # insert condition
-            self.robot.drive_system.left_motor = -left
-            self.robot.drive_system.right_motor = -right
+            self.robot.drive_system.left_motor.turn_on(-1*left)
+            self.robot.drive_system.right_motor.turn_on(-1*right)
             position = (self.robot.drive_system.left_motor.get_position() + self.robot.drive_system.right_motor.get_position()) / 2
+
+        self.robot.drive_system.left_motor.turn_off()
+        self.robot.drive_system.right_motor.turn_off()
 
         print('Movement has concluded')
 
@@ -92,8 +97,9 @@ class MyRobotDelegate(object):
 
         final_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance()
 
-        if abs(final_pos - init_pos) < (dist - (dist / 5)) | abs(final_pos - init_pos) > (dist + (dist / 5)):
-            print('Unfortunately it was wildly off. Perhaps the code is wrong or a sensor is malfunctioning')
+        if abs(final_pos - init_pos) < (dist - (dist / 5)) or abs(final_pos - init_pos) > (dist + (dist / 5)):
+            print(
+                'Unfortunately it was wildly off. Perhaps the code is wrong or a sensor is malfunctioning. Or maybe it is just on the wooden board or something stupid like that.')
         else:
             print('It arrived within 20% of its target distance. Nice work!')
 

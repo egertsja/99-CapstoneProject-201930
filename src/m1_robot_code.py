@@ -73,7 +73,7 @@ class MyRobotDelegate(object):
         self.robot.drive_system.left_motor.reset_position()
         self.robot.drive_system.right_motor.reset_position()
 
-        init_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance()
+        init_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
 
         # Determine inches/degree (inches from dist, degrees from sensor)
         degrees = 360
@@ -95,13 +95,33 @@ class MyRobotDelegate(object):
 
         # Check distance
 
-        final_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance()
+        final_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
 
         if abs(final_pos - init_pos) < (dist - (dist / 5)) or abs(final_pos - init_pos) > (dist + (dist / 5)):
             print(
                 'Unfortunately it was wildly off. Perhaps the code is wrong or a sensor is malfunctioning. Or maybe it is just on the wooden board or something stupid like that.')
         else:
             print('It arrived within 20% of its target distance. Nice work!')
+
+        def go_until_distance(X,delta,speed):
+            while True:
+                measure1 = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
+                measure2 = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
+                measure3 = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
+                measure4 = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
+                measure5 = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
+
+                if((measure1+measure2+measure3+measure4+measure5)/5 < (X-delta)):
+                    self.robot.drive_system.left_motor.turn_on(-1 * speed)
+                    self.robot.drive_system.right_motor.turn_on(-1 * speed)
+                elif((measure1+measure2+measure3+measure4+measure5)/5 > (X+delta)):
+                    self.robot.drive_system.left_motor.turn_on(1 * speed)
+                    self.robot.drive_system.right_motor.turn_on(1 * speed)
+                else:
+                    self.robot.drive_system.left_motor.turn_off()
+                    self.robot.drive_system.right_motor.turn_off()
+                    #Put in check here to make sure it doesn't overshoot by accident
+                    break
 
 
 def print_message_received(method_name, arguments):

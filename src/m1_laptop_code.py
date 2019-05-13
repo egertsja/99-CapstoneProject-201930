@@ -27,20 +27,26 @@ def get_my_frame(root, window, mqtt_sender):
     # TODO: Put your GUI onto your frame (using sub-frames if you wish).
     forward_button = ttk.Button(frame, text="Go Forward")
     backward_button = ttk.Button(frame, text="Go Backward")
+    go_until_button = ttk.Button(frame, text="Go Until (Distance)")
     speed_entry = ttk.Entry(frame)
     speed_entry.insert(0,"Speed")
     dist_entry = ttk.Entry(frame)
     dist_entry.insert(0,"Distance")
+    delta_entry = ttk.Entry(frame)
+    delta_entry.insert(0,"Delta (for Go Until)")
 
     forward_button.grid()
     backward_button.grid()
+    go_until_button.grid()
     speed_entry.grid()
     dist_entry.grid()
+    delta_entry.grid()
 
     forward_button["command"] = lambda: send_forward(
         int(speed_entry.get()), int(speed_entry.get()), int(dist_entry.get()), mqtt_sender)
     backward_button["command"] = lambda: send_backward(
         int(speed_entry.get()), int(speed_entry.get()), int(dist_entry.get()), mqtt_sender)
+    go_until_button["command"] = lambda: send_go_until(int(speed_entry.get()),int(dist_entry.get()),int(delta_entry.get()),mqtt_sender)
     # Return your frame:
     return frame
 
@@ -64,11 +70,14 @@ class MyLaptopDelegate(object):
 # TODO: Add functions here as needed.
 
 def send_forward(left,right,dist,mqtt):
-    i=0
     print('Sending Message: Forward', left, dist)
     mqtt.send_message("forward",[left,right,dist])
 
 def send_backward(left,right,dist,mqtt):
-    i=0
-    print('Sending Mesage: Backward', left, dist)
+    print('Sending Message: Backward', left, dist)
     mqtt.send_message("backward",[left,right,dist])
+
+def send_go_until(speed,dist,delta,mqtt):
+    i=0
+    print('Sending Message: Go Until',speed,dist,delta)
+    mqtt.send_message("go_until",[speed,dist,delta])

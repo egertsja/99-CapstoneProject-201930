@@ -15,10 +15,9 @@ import mqtt_remote_method_calls as mqtt
 import m1_laptop_code as m1
 import m3_laptop_code as m3
 
-
 def get_my_frame(root, window, mqtt_sender):
     # Construct your frame:
-    frame = ttk.Frame(window, padding=10, borderwidth=5, relief="ridge")
+    frame = ttk.Frame(window, padding=12, borderwidth=5, relief="ridge")
     frame_label = ttk.Label(frame, text="Zach Witonsky")
     frame_label.grid()
     # DONE 2: Put your name in the above.
@@ -28,30 +27,40 @@ def get_my_frame(root, window, mqtt_sender):
 
     spin_left_label = ttk.Label(frame, text="Left wheel speed (0 to 100)")
     spin_right_label = ttk.Label(frame, text="Right wheel speed (0 to 100)")
+    number_spins_label = ttk.Label(frame, text="# spins")
 
-    spin_left_entry = ttk.Entry(frame, width=10)
+    spin_left_entry = ttk.Entry(frame, width=10, justify=tkinter.CENTER)
     spin_left_entry.insert(0, "100")
-    spin_right_entry = ttk.Entry(frame, width=10, justify=tkinter.RIGHT)
+    spin_right_entry = ttk.Entry(frame, width=10, justify=tkinter.CENTER)
     spin_right_entry.insert(0, "100")
+    number_spins_entry = ttk.Entry(frame, width=15, justify=tkinter.CENTER)
+    number_spins_entry.insert(0, "3")
 
     left_button = ttk.Button(frame, text="Spin Left", width=10)
     right_button = ttk.Button(frame, text="Spin Right", width=10)
-    stop_button = ttk.Button(frame, text="Stop")
+    number_spins_button = ttk.Button(frame, text="Rotations", width=15)
+    stop_button = ttk.Button(frame, text="Stop", width=15)
 
     frame_label.grid(row=0, column=1)
     spin_left_label.grid(row=1, column=0)
     spin_right_label.grid(row=1, column=2)
+    number_spins_label.grid(row=1, column=1)
+
     spin_left_entry.grid(row=2, column=0)
     spin_right_entry.grid(row=2, column=2)
+    number_spins_entry.grid(row=2, column=1)
 
-    left_button.grid(row=4, column=0)
-    right_button.grid(row=4, column=2)
+    left_button.grid(row=3, column=0)
+    right_button.grid(row=3, column=2)
+    number_spins_button.grid(row=3, column=1)
     stop_button.grid(row=4, column=1)
 
     left_button["command"] = lambda: handle_spin_left(
         spin_left_entry, spin_right_entry, mqtt_sender)
     right_button["command"] = lambda: handle_spin_right(
         spin_left_entry, spin_right_entry, mqtt_sender)
+    # number_spins_button["command"] = lambda: handle_number_spins()
+
     stop_button["command"] = lambda: handle_stop(mqtt_sender)
 
     # Return your frame:
@@ -77,7 +86,8 @@ class MyLaptopDelegate(object):
 def go(mqtt_sender, direction, spin_left_speed, spin_right_speed):
     print()
     print(direction)
-    print("  using wheel motor speeds:", spin_left_speed, spin_right_speed)
+    print("Left wheel motor speed:", spin_left_speed)
+    print("Right wheel motor speed:", spin_right_speed)
     mqtt_sender.send_message("go", [spin_left_speed, spin_right_speed])
 
 def handle_spin_left(spin_left_box, spin_right_box, mqtt_sender):
@@ -89,6 +99,8 @@ def handle_spin_right(spin_left_box, spin_right_box, mqtt_sender):
     left = int(spin_left_box.get())
     right = -int(spin_right_box.get())
     go(mqtt_sender, "SPIN RIGHT", left, right)
+
+# def handle_number_spins():
 
 def handle_stop(mqtt_sender):
     print()

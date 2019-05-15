@@ -117,4 +117,5 @@ def send_backward(left, right, dist, mqtt):
     print('Sending Mesage: Backward', left, dist)
     mqtt.send_message("backward", [left, right, dist])
 
+print()
 

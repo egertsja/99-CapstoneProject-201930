@@ -8,6 +8,7 @@
 
 import mqtt_remote_method_calls as mqtt
 import rosebot
+import time
 import m2_robot_code as m2
 import m3_robot_code as m3
 
@@ -37,7 +38,14 @@ class MyRobotDelegate(object):
         self.robot.drive_system.left_motor.reset_position()
         self.robot.drive_system.right_motor.reset_position()
 
-        init_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance()
+        lis = []
+        for k in range(5):
+            lis = lis + [self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()]
+            time.sleep(.03)
+
+        init_pos = average(lis, True)
+
+        print(init_pos)
 
         #Determine inches/degree (inches from dist, degrees from sensor)
         degrees = 360
@@ -59,7 +67,12 @@ class MyRobotDelegate(object):
 
         #Check distance
 
-        final_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance()
+        lis = []
+        for k in range(5):
+            lis = lis + [self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()]
+            time.sleep(0.1)
+
+        final_pos = average(lis, True)
 
         if abs(final_pos-init_pos) < (dist - (dist/5)) or abs(final_pos-init_pos) > (dist + (dist/5)):
             print('Unfortunately it was wildly off. Perhaps the code is wrong or a sensor is malfunctioning. Or maybe it is just on the wooden board or something stupid like that.')
@@ -73,7 +86,16 @@ class MyRobotDelegate(object):
         self.robot.drive_system.left_motor.reset_position()
         self.robot.drive_system.right_motor.reset_position()
 
-        init_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
+        #Get the initial position on the rangefinder
+        lis=[]
+        for k in range(5):
+            lis = lis + [self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()]
+            time.sleep(.03)
+
+        init_pos = average(lis, True)
+
+        print(init_pos)
+
 
         # Determine inches/degree (inches from dist, degrees from sensor)
         degrees = 360
@@ -94,8 +116,15 @@ class MyRobotDelegate(object):
         print('Movement has concluded')
 
         # Check distance
+        lis=[]
+        for k in range(5):
+            lis = lis + [self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()]
+            time.sleep(0.03)
 
-        final_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
+
+        final_pos = average(lis,True)
+
+        print(final_pos)
 
         if abs(final_pos - init_pos) < (dist - (dist / 5)) or abs(final_pos - init_pos) > (dist + (dist / 5)):
             print(
@@ -103,25 +132,27 @@ class MyRobotDelegate(object):
         else:
             print('It arrived within 20% of its target distance. Nice work!')
 
-        def go_until_distance(X,delta,speed):
-            while True:
-                measure1 = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
-                measure2 = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
-                measure3 = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
-                measure4 = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
-                measure5 = self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()
 
-                if((measure1+measure2+measure3+measure4+measure5)/5 < (X-delta)):
-                    self.robot.drive_system.left_motor.turn_on(-1 * speed)
-                    self.robot.drive_system.right_motor.turn_on(-1 * speed)
-                elif((measure1+measure2+measure3+measure4+measure5)/5 > (X+delta)):
-                    self.robot.drive_system.left_motor.turn_on(1 * speed)
-                    self.robot.drive_system.right_motor.turn_on(1 * speed)
-                else:
-                    self.robot.drive_system.left_motor.turn_off()
-                    self.robot.drive_system.right_motor.turn_off()
-                    #Put in check here to make sure it doesn't overshoot by accident
-                    break
+    def go_until(self,X,delta,speed):
+        while True:
+            lis = []
+            for k in range(5):
+                lis = lis + [self.robot.sensor_system.ir_proximity_sensor.get_distance_in_inches()]
+                time.sleep(0.03)
+
+            avg=average(lis,True)
+
+            if(avg < (X-delta)):
+                self.robot.drive_system.left_motor.turn_on(-1 * speed)
+                self.robot.drive_system.right_motor.turn_on(-1 * speed)
+            elif(avg > (X+delta)):
+                self.robot.drive_system.left_motor.turn_on(1 * speed)
+                self.robot.drive_system.right_motor.turn_on(1 * speed)
+            else:
+                self.robot.drive_system.left_motor.turn_off()
+                self.robot.drive_system.right_motor.turn_off()
+                #Put in check here to make sure it doesn't overshoot by accident
+                break
 
 
 def print_message_received(method_name, arguments):
@@ -132,4 +163,25 @@ def print_message_received(method_name, arguments):
 
 # TODO: Add functions here as needed.
 
-
+def average(lis,method=False):
+    avg=0
+    print(lis) #
+    lis.sort()
+    print(lis)
+    if method==False:
+        avg_num = 0
+        for k in range(len(lis)):
+            avg_num = avg_num + lis[k]
+        avg = avg_num / len(lis)
+        print(str(avg))
+    elif method==True:
+        list2=[]
+        for k in range(1,len(lis)-1):
+            list2=list2+[lis[k]]
+        print(str(list2))
+        avg_num=0
+        for k in range(len(list2)):
+            avg_num=avg_num+list2[k]
+        avg=avg_num/len(list2)
+        print(str(avg))
+    return avg

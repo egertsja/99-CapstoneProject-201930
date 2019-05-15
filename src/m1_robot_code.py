@@ -165,7 +165,7 @@ def print_message_received(method_name, arguments):
 
 def average(lis,method=False):
     avg=0
-    print(lis)
+    print(lis) #
     lis.sort()
     print(lis)
     if method==False:

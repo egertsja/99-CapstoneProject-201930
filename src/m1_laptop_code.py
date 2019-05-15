@@ -79,5 +79,5 @@ def send_backward(left,right,dist,mqtt):
 
 def send_go_until(speed,dist,delta,mqtt):
     i=0
-    print('Sending Message: Go Until',speed,dist,delta)
-    mqtt.send_message("go_until",[speed,dist,delta])
+    print('Sending Message: Go Until',dist,delta,speed)
+    mqtt.send_message("go_until",[dist,delta,speed])

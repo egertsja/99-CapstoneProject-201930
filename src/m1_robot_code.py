@@ -127,6 +127,7 @@ class MyRobotDelegate(object):
         print(final_pos)
 
         if abs(final_pos - init_pos) < (dist - (dist / 5)) or abs(final_pos - init_pos) > (dist + (dist / 5)):
+            #self.robot.SoundSystem.beeper.beep()
             print(
                 'Unfortunately it was wildly off. Perhaps the code is wrong or a sensor is malfunctioning. Or maybe it is just on the wooden board or something stupid like that.')
         else:

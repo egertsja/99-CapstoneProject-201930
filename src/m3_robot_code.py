@@ -1,10 +1,10 @@
 """
   Capstone Project.  Code to run on the EV3 robot (NOT on a laptop).
   Author:  Your professors (for the framework)
-    and PUT_YOUR_NAME_HERE.
+    and Shane Saylor.
   Spring term, 2018-2019.
 """
-# TODO 1:  Put your name in the above.
+# DONE 1:  Put your name in the above.
 
 import mqtt_remote_method_calls as mqtt
 import rosebot
@@ -27,6 +27,60 @@ class MyRobotDelegate(object):
         self.mqtt_sender = mqtt_sender
 
     # TODO: Add methods here as needed.
+    def arm_up(self, speed):
+        #Moves the arm all the way up to its touch sensor
+        self.robot.arm_and_claw.motor.turn_on(speed)
+        while True:
+            if self.robot.arm_and_claw.touch_sensor.is_pressed():
+                self.robot.arm_and_claw.motor.turn_off()
+                break
+
+    def arm_calibrate(self, speed):
+        '''
+        Moves the arm all the way up to its touch sensor
+        Then down 14.2 revolutions
+        Then sets that position as 0
+        '''
+        self.arm_up(speed)
+        self.robot.arm_and_claw.motor.reset_position()
+        self.robot.arm_and_claw.motor.turn_on(-1 * speed)
+        while True:
+            if self.robot.arm_and_claw.motor.get_position() == -14.2*360:
+                self.robot.arm_and_claw.motor.turn_off()
+                break
+        self.robot.arm_and_claw.motor.reset_position()
+
+    def arm_to(self, speed, position):
+        """Moves arm up or down to the given position"""
+        while True:
+            current = self.robot.arm_and_claw.motor.get_position()
+            if current < position:
+                self.robot.arm_and_claw.motor.turn_on(speed)
+            elif current > position:
+                self.robot.arm_and_claw.motor.turn_on(-1*speed)
+            else:
+                self.robot.arm_and_claw.motor.turn_off()
+                break
+
+    def arm_down(self, speed):
+        """Moves arm down to position 0"""
+        self.robot.arm_and_claw.motor.turn_on(-1*speed)
+        while True:
+            current = self.robot.arm_and_claw.motor.get_position()
+            if current == 0:
+                self.robot.arm_and_claw.motor.turn_off()
+                break
+
+    def go_until_color(self, color, speed):
+        """Goes forward until the ColorSensor sees the given color"""
+        self.robot.drive_system.go(speed, speed)
+        while True:
+            current = self.robot.sensor_system.color_sensor.get_color_as_name()
+            if current == color:
+                self.robot.drive_system.stop()
+                break
+
+
 
 
 def print_message_received(method_name, arguments=None):

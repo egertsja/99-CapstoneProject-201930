@@ -8,6 +8,7 @@
 
 import mqtt_remote_method_calls as mqtt
 import rosebot
+import time
 import m2_robot_code as m2
 import m3_robot_code as m3
 
@@ -30,43 +31,23 @@ class MyRobotDelegate(object):
         print_message_received("stop")
         self.robot.drive_system.stop()
 
-    def spin_left(self, left, right, dist):
-        """Spins left"""
+    def spin(self, left_motor_speed, right_motor_speed):
+        """Spins"""
+        print_message_received("spin", [left_motor_speed, right_motor_speed])
+        self.robot.drive_system.go(left_motor_speed, right_motor_speed)
+
+    def deg(self,  left_motor_speed, right_motor_speed, deg):
 
         self.robot.drive_system.left_motor.reset_position()
         self.robot.drive_system.right_motor.reset_position()
 
-        init_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance()
+        self.robot.drive_system.go(left_motor_speed, right_motor_speed)
 
-        # Determine inches/degree (inches from dist, degrees from sensor)
-        degrees = 360
-        dist_per_spin = self.robot.drive_system.wheel_circumference
-        deg_ratio = degrees / dist_per_spin
-        dist_deg = deg_ratio * dist
-
-        position = (
-                               self.robot.drive_system.left_motor.get_position() + self.robot.drive_system.right_motor.get_position()) / 2
-
-        while abs(position) < dist_deg:  # insert condition
-            self.robot.drive_system.left_motor.turn_on(left)
-            self.robot.drive_system.right_motor.turn_on(right)
-            position = (
-                                   self.robot.drive_system.left_motor.get_position() + self.robot.drive_system.right_motor.get_position()) / 2
+        while abs(self.robot.drive_system.left_motor.get_position()/4.5) < deg:  # insert condition
+            pass
 
         self.robot.drive_system.left_motor.turn_off()
         self.robot.drive_system.right_motor.turn_off()
-
-        print('Movement has concluded')
-
-        # Check distance
-
-        final_pos = self.robot.sensor_system.ir_proximity_sensor.get_distance()
-
-        if abs(final_pos - init_pos) < (dist - (dist / 5)) or abs(final_pos - init_pos) > (dist + (dist / 5)):
-            print(
-                'Unfortunately it was wildly off. Perhaps the code is wrong or a sensor is malfunctioning. Or maybe it is just on the wooden board or something stupid like that.')
-        else:
-            print('It arrived within 20% of its target distance. Nice work!')
 
     # TODO: Add methods here as needed.
 

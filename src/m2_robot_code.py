@@ -36,7 +36,7 @@ class MyRobotDelegate(object):
         print_message_received("spin", [left_motor_speed, right_motor_speed])
         self.robot.drive_system.go(left_motor_speed, right_motor_speed)
 
-    def deg(self,  left_motor_speed, right_motor_speed, deg):
+    def deg(self, left_motor_speed, right_motor_speed, deg):
 
         self.robot.drive_system.left_motor.reset_position()
         self.robot.drive_system.right_motor.reset_position()
@@ -48,6 +48,13 @@ class MyRobotDelegate(object):
 
         self.robot.drive_system.left_motor.turn_off()
         self.robot.drive_system.right_motor.turn_off()
+
+    def spin_until_facing(self, signature, x, delta, speed, big_enough):
+        self.robot.drive_system.go(speed, -speed)
+
+
+
+
 
     # TODO: Add methods here as needed.
 

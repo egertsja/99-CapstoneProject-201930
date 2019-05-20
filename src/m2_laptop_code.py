@@ -40,7 +40,6 @@ def get_my_frame(root, window, mqtt_sender):
     x_entry = ttk.Entry(frame, width=10, justify=tkinter.CENTER)
     x_entry.insert(0, "10")
 
-
     left_button = ttk.Button(frame, text="Spin Left", width=10)
     right_button = ttk.Button(frame, text="Spin Right", width=10)
     stop_button = ttk.Button(frame, text="Stop", width=8)
@@ -66,7 +65,8 @@ def get_my_frame(root, window, mqtt_sender):
         spin_left_entry, spin_left_entry, deg_entry, mqtt_sender)
     right_button["command"] = lambda: handle_spin_right(
         spin_left_entry, spin_left_entry, deg_entry, mqtt_sender)
-    stop_button["command"] = lambda: handle_stop(mqtt_sender)
+    stop_button["command"] = lambda: handle_stop(
+        mqtt_sender)
     signature_button["command"] = lambda: handle_spin_until_facing(
         x_entry, spin_left_entry, mqtt_sender)
 

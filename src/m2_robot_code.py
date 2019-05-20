@@ -49,12 +49,23 @@ class MyRobotDelegate(object):
         self.robot.drive_system.left_motor.turn_off()
         self.robot.drive_system.right_motor.turn_off()
 
-    def spin_until_facing(self, signature, x, delta, speed, big_enough):
+    def spin_until_facing(self, x, speed):
         self.robot.drive_system.go(speed, -speed)
-
-
-
-
+        while True:
+            blob = self.robot.sensor_system.camera.get_biggest_blob()
+            print(blob)
+            # left
+            if blob.center.x >= x:
+                self.robot.drive_system.stop()
+                break
+            # right
+            if blob.center.x <= x:
+                self.robot.drive_system.stop()
+                break
+                
+# take out signature and delta and big_enough
+# stopping cond: center of object x cord is "close to" x
+#
 
     # TODO: Add methods here as needed.
 

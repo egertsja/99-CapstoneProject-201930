@@ -28,7 +28,7 @@ class MyRobotDelegate(object):
 
     # TODO: Add methods here as needed.
     def arm_up(self, speed):
-        #Moves the arm all the way up to its touch sensor
+        """Moves the arm all the way up to its touch sensor"""
         self.robot.arm_and_claw.motor.turn_on(speed)
         while True:
             if self.robot.arm_and_claw.touch_sensor.is_pressed():
@@ -36,11 +36,11 @@ class MyRobotDelegate(object):
                 break
 
     def arm_calibrate(self, speed):
-        '''
+        """
         Moves the arm all the way up to its touch sensor
         Then down 14.2 revolutions
         Then sets that position as 0
-        '''
+        """
         self.arm_up(speed)
         self.robot.arm_and_claw.motor.reset_position()
         self.robot.arm_and_claw.motor.turn_on(-1 * speed)
@@ -52,8 +52,10 @@ class MyRobotDelegate(object):
 
     def arm_to(self, speed, position):
         """Moves arm up or down to the given position"""
+        print('Arm_to')
         while True:
             current = self.robot.arm_and_claw.motor.get_position()
+            print(current)
             if current < position:
                 self.robot.arm_and_claw.motor.turn_on(speed)
             elif current > position:
@@ -73,14 +75,13 @@ class MyRobotDelegate(object):
 
     def go_until_color(self, color, speed):
         """Goes forward until the ColorSensor sees the given color"""
+        goal = self.robot.sensor_system.color_sensor.get_color_number_from_color_name(color)
         self.robot.drive_system.go(speed, speed)
         while True:
-            current = self.robot.sensor_system.color_sensor.get_color_as_name()
-            if current == color:
+            current = self.robot.sensor_system.color_sensor.get_color()
+            if current == goal:
                 self.robot.drive_system.stop()
                 break
-
-
 
 
 def print_message_received(method_name, arguments=None):
